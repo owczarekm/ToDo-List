@@ -1,0 +1,28 @@
+.navbar-brand{
+    float:left;
+}
+.navbar{
+    display: inline-block;
+    float: none;
+    vertical-align: top;
+}
+.todo_sidebar{
+    float:left;
+
+    width: 10vw;;
+    height:98vh ;
+    background-color:grey;
+}
+.todo_content{
+    padding-left:13vw;
+    padding-top:1vh;
+    padding-right: 3vw;
+    width:100%;
+    height:98vh;
+     background-color:lightblue;
+}
+.todo_subtask{
+    width:70%;
+    margin-left:6%;
+
+}
