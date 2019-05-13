@@ -1,0 +1,44 @@
+.navbar-brand{
+    float:left;
+}
+.navbar{
+    display: inline-block;
+    float: none;
+    vertical-align: top;
+}
+.todo_sidebar{
+    float:left;
+
+    height:98vh ;
+    background-color:grey;
+}
+.todo_container{
+ 
+    height:98vh;
+    background-color:lightblue;
+
+}
+.todo_container_header{
+    margin-left:2%;
+    margin-right:2%;
+    font-size:24px;
+}
+.todo_content{
+    padding-right:2%;
+    padding-left:2%;
+    height:100%;
+ 
+
+
+}
+.todo_subtask{
+    width:70%;
+    margin-left:6%;
+
+}
+.scrollbar {
+    overflow-y: scroll;
+}
+.thin::-webkit-scrollbar {
+    width: 0px;
+ }
