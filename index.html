@@ -14,30 +14,33 @@
 
         <header class="navbar navbar-dark bg-dark text-secondary display-5 font-weight-bold  container-fluid">
             <a class="navbar-brand">ToDo</a>
-            <form class="form-inline justify-content-center">
-                <input class="form-control mr-sm-1 " type="search" placeholder="Wyszukaj zadanie" arial-label="Search">
-                <button class="btn btn-sm btn-outline-primary my-1 my-sm-0" type="submint">Wyszukaj</button>
-                </form>
         </header>
         <div class="containter-fluid">
             <div class="row">
-                <div class="col-2 todo_sidebar">
-                    <ul>
-                        <li>cos</li>
-                        <li>cos</li>
+                <div class="col-2 col-lg-1 todo_sidebar">
+                    <ul class="list-group pl-1" id="todoMenu">
+                            <!-- <button type="button" class="btn btn-link p-0" id="showAddForm">Dodaj zadanie</button> -->
+                        <li>Priorytet</li>
+                        <li class ="justify-content-between"><button type="button" class="btn btn-dark btn-sm m-0" id="allWip">Wszystkie<span class="badge badge-primary badge-pill m-1" id="badgeAllWip"></span></button></li>
+                        <ul class="list-group pl-1">
+                            <li><button type="button" class="btn  btn-dark btn-sm m-1 " id="allHigh">Wysoki<span class="badge badge-primary badge-pill m-1" id="badgeHigh"></span></button></li>
+                            <li><button type="button" class="btn btn-dark btn-sm m-1" id="allNormal">Normalny<span class="badge badge-primary badge-pill m-1" id="badgeNormal"></span></button></li>
+                            <li><button type="button" class="btn btn-dark btn-sm m-1" id="allLow">Niski<span class="badge badge-primary badge-pill m-1" id="badgeLow"></span></button></li>
+                        </ul>
+                        <li><button type="button" class="btn btn-dark btn-sm m-0 " id="allDone">Zakończone<span class="badge badge-primary badge-pill m-1" id="badgeDone"></span></button></li>
                     </ul>    
                 </div>
-                <div class="col-10 pl-0">
+                <div class="col-10 col-lg-11 pl-0">
                         <div class="todo_container scrollbar thin">
                             <div class="todo_container_header">
                                 <span class="font-weight-bold text-secondary">Zadania</span>
                                 <button type="button" class="btn btn-link p-0" id="showAddForm">Dodaj zadanie</button>
                             </div>
-                        <div class="todo_content" id="addListForm">
+                        <div class="todo_content form_container" id="addListForm">
                             <form id='addForm'>
                                 <div class="form-group">
                                     <label for= "formTitle">Nazwa zadania</label>
-                                    <input type="text" class="form-control" id="formTitle">
+                                    <input type="text" class="form-control" id="formTitle" >
                                 </div>
                                 <div class="form-group">
                                         <label for= "formPriority">Wybierz priorytet</label>
@@ -53,14 +56,22 @@
                                 </div>
                                 <div class="form-group">
                                         <label for= "formUrl">Url</label>
-                                        <input type="text" class="form-control" id="formUrl">
+                                        <input type="url" class="form-control" id="formUrl">
                                 </div>
+                                <div class="form-group">
+                                        <label for= "formExtra">Status zadania</label>
+                                        <select type="text" class="form-control" id="formExtra">
+                                            <option value ='active'>Do zrobienia</option>
+                                            <option value="done">Zrobione</option>
+                                        </select>
+                                </div>
+                              
                                 <div class="form-group">
                                         <label for= "formAuthor">Autor zadania</label>
                                         <input type="text" class="form-control" id="formAuthor">
                                 </div>
-                                <button type="button" class="btn btn-primary" id="addItemForm">Dodaj</button>
-                                <button type="button" class="btn btn-primary">Submit</button>
+                                <button type="button" class="btn btn-primary" id="addOrUpdateItemForm">Dodaj</button>
+                                <button type="button" class="btn btn-primary" id="cancelBtn">Anuluj</button>
 
    
                         
@@ -72,11 +83,13 @@
                 </div>
             </div>
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.rawgit.com/PascaleBeier/bootstrap-validate/v2.2.0/dist/bootstrap-validate.js"></script>
+
 
         <script src="main.js"></script>
-        //<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-        //<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-        //<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
     </body>
 </html>
