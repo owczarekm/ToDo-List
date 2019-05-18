@@ -1,8 +1,10 @@
-let $list;
-let $addTaskForm;
-let $addItem;
-let $addOrUpdateItemBtn;
-let $showAddFormBtn;
+let $list,$addTaskForm,$addItem,$addOrUpdateItemBtn,$showAddFormBtn,$cancelBtn,$highPrioQuantity,$normalPrioQuantity,$lowPrioQuantity,$doneQuantity;
+let $badgeAllWip,$badgeHigh,$badgeNormal,$badgeLow,$badgeDone, $todo_menu;
+const PRIORITY ={
+    'high':'0',
+    'normal':'10',
+    'low':'20',
+}
 const BASE_URL = 'http://195.181.210.249:3000/todo/';
 
 function main(){
@@ -13,29 +15,51 @@ function main(){
 
 
 
+
 }
 async function getAllTodos(){
     try{
         let result = await axios.get(BASE_URL);
         prepareTodos(result.data);
+        showAllWip();
     } catch(error){
         console.log('Wystapil bład podczas połączenia z serwerem' + error);
     }
  
 }
 
+//zliczanie wedlug priorytetu i zakonczonych zadan
+function coutByPriority($list){
+    let  elements = Array.from($list.children);
+    let elementsActive =elements.filter(el => el.dataset.extra != 'done')
+    $doneQuantity = elements.filter(el => el.dataset.extra === 'done').length;
+    $highPrioQuantity = elementsActive.filter(el => (el.dataset.priority === '0')).length;
+    $normalPrioQuantity = elementsActive.filter(el => (el.dataset.priority === '10')).length;
+    $lowPrioQuantity = elementsActive.filter(el => el.dataset.priority === '20').length;
+    $allWip= $highPrioQuantity + $normalPrioQuantity + $lowPrioQuantity;
+    fillMenu();
+ }
+ function fillMenu(){
+    $badgeAllWip.innerText=$allWip;
+    $badgeHigh.innerText =$highPrioQuantity;
+    $badgeNormal.innerText =$normalPrioQuantity
+    $badgeLow.innerText = $lowPrioQuantity;
+    $badgeDone.innerText =$doneQuantity;
+}
 //dodanie elementów do listy todo
 function prepareTodos(elements){
     elements.forEach(element => {
         addElementToList($list,element)
     });
+    coutByPriority($list);
 }
 function addElementToList($listWhereAdd,todo){
     var createElement =createTodoDiv(todo);
     $listWhereAdd.appendChild(createElement);
 }
-function textPriority(el){
-    switch(el){
+//zamiana wartosci liczbowej priorytetu na tekstowa 0-wysoki,10- normalny,20-niski
+function textPriority(priority){
+    switch(priority){
         case 0 :
             return 'Wysoki';
             break;
@@ -47,59 +71,65 @@ function textPriority(el){
             break;
         default:
         return 'Normalny';
-
-
     }
-        
 }
-function createTodoTable(todo){
-    //tworzenie tabeli i nadanie styli
+
+//tworzenie tabeli dla jednego zadania
+//tworzenie tabeli i nadanie styli
+function createTableHeader(title,priority){
     let tbl = document.createElement("table");
-    tbl.classList.add("table","table-borderless","table-dark");
+    tbl.classList.add("table","table-dark","table-bordered");
     //tworzenie nagłówka tabeli
     let tblH = tbl.createTHead();
     let tblHr = tblH.insertRow(0);
     let tblHc = tblHr.insertCell(0);
-    tblHc.innerText = todo.title;
+    tblHc.innerText = title;
     tblHc = tblHr.insertCell(1);
-    tblHc.classList.add("text-right");
+    tblHc.classList.add("text-right","w-25");
     tblHc.id = 'priority';
-    tblHc.innerText = 'Priorytet: ';
-    tblHc.innerText += textPriority(todo.priority);
-    //tworzenie body tabeli w zalezonosci od tego czy pola sa nullem dodawanie kolejnych wierszy
-    let tblBody = tbl.createTBody();
+    tblHc.innerText = 'Priorytet: '+ textPriority(priority);
+    return tbl;
+}
+//tworzenie body tabeli w zalezonosci od tego czy pola sa nullem dodawanie kolejnych wierszy
+function createTableBody(table,description,url,author){
+    let tblBody = table.createTBody();
     let rowCounter = 0;
-    if(todo.description != null){
+    if(description != null){
         let tlbDescRow = tblBody.insertRow(rowCounter);
         let tlbDescCell =tlbDescRow.insertCell(0);
+        tlbDescCell.colSpan =2;
         tlbDescCell.dataset.id ='description';
-        tlbDescCell.innerText = todo.description;
+        tlbDescCell.innerText = 'Opis zadania: '+ description;
         rowCounter++;
     }
-    if(todo.url != null){
+    if(url !== null){
         let tlbUrlRow = tblBody.insertRow(rowCounter);
         let tlbUrlCell =tlbUrlRow.insertCell(0);
+        tlbUrlCell.colSpan =2;
         tlbUrlCell.dataset.id ='url';
-        tlbUrlCell.innerText = todo.url;
+        tlbUrlCell.innerText ="Url: "+ url;
         rowCounter++;
     }
-    if(todo.author != null){
+    if(author != ''){
         let tlbAuthorRow = tblBody.insertRow(rowCounter);
         let tlbAuthorCell =tlbAuthorRow.insertCell(0);
         tlbAuthorCell =tlbAuthorRow.insertCell(1);
         tlbAuthorCell.dataset.id='author';
-        tlbAuthorCell.innerText = 'Autor: '+ todo.author;
+        tlbAuthorCell.innerText = 'Autor: '+ author;
         tlbAuthorCell.classList.add("text-right")
         rowCounter++;
     }
-    //tworzenie footera tabeli z przyciskami do edycji i usuwania
-    let tblFooter = tbl.createTFoot();
+}
+//tworzenie footera tabeli z przyciskami do edycji i usuwania
+function createTableFooter(table,id){
+    let tblFooter = table.createTFoot();
     let tblFooterRow = tblFooter.insertRow(0);
     let tblFooterCell = tblFooterRow.insertCell(0);
+    tblFooterCell.colSpan =2;
     //dodanie przyciskow usuwania i edycji
     let editButton = document.createElement('button');
     editButton.textContent = 'Edytuj zadanie';
-    editButton.dataset.id = todo.id;
+    editButton.dataset.id = id;
     editButton.dataset.name = 'edit';
     editButton.dataset.type='edit';
     editButton.classList.add("btn","btn-outline-info","btm-sm","m-1");
@@ -107,16 +137,34 @@ function createTodoTable(todo){
     let deleteButton = document.createElement('button');
     deleteButton.textContent = 'Usuń zadanie';
     deleteButton.classList.add("btn","btn-outline-danger","btm-sm","m-1");
-    deleteButton.dataset.id = todo.id;
+    deleteButton.dataset.id = id;
     deleteButton.dataset.name ='delete';
     tblFooterCell.appendChild(deleteButton);
+}
+
+
+function createTodoTable(todo){
     
+    let tbl =createTableHeader(todo.title, todo.priority,todo.extra);
+    createTableBody(tbl,todo.description,todo.url,todo.author);
+    createTableFooter(tbl,todo.id);
     return tbl;
 }
 
 function createTodoDiv(todo){
     let newDivElement = document.createElement('div');
     newDivElement.id = todo.id;
+    if(todo.extra === 'active' || todo.extra ==='done'){
+        newDivElement.dataset.extra = todo.extra;
+    }else{
+        newDivElement.dataset.extra = 'active'
+    }
+    if(todo.priority === 0 || todo.priority === 10 || todo.priority === 20 ){
+        newDivElement.dataset.priority = todo.priority;    
+    } else{
+        newDivElement.dataset.priority = '10';
+    }
+    
     newDivElement.classList.add("todo_task");
     newDivElement.appendChild(createTodoTable(todo));
     return newDivElement;
@@ -127,7 +175,14 @@ function prepareDOMElement(){
     $list = document.getElementById('taskList');
     $addTaskForm = document.getElementById('addListForm');
     $addOrUpdateItemBtn = document.getElementById('addItemForm');
-    $list.addEventListener('click',listClickHandler);
+    //obsluga menu
+    $todoMenu = document.getElementById('todoMenu');
+    $badgeAllWip = document.getElementById('badgeAllWip');
+    $badgeHigh = document.getElementById('badgeHigh');
+    $badgeNormal = document.getElementById('badgeNormal');
+    $badgeLow = document.getElementById('badgeLow');
+    $badgeDone = document.getElementById('badgeDone');
+    $cancelBtn = document.getElementById('cancelBtn');
     $addTaskForm.style.display = 'none';
     $list.style.display = 'block';
 
@@ -150,6 +205,7 @@ function listClickHandler(event){
  function deleteTodo(elementId){
      axios.delete(BASE_URL + elementId);
     document.getElementById(elementId).remove();
+    coutByPriority($list);
 }
 //edycja zadania
 function prepareFormEdit(elementId){
@@ -162,12 +218,13 @@ function prepareFormEdit(elementId){
  
 }
  function fillForm(element){
-     let todo =element[0];
+    let todo =element[0];
     document.getElementById('formTitle').value =todo.title;
     document.getElementById('formPriority').value = todo.priority;
     document.getElementById('formUrl').value =todo.url;
     document.getElementById('formAuthor').value = todo.author
     document.getElementById('formDesc').value = todo.description;
+    document.getElementById("formExtra").value = todo.extra;
     $addOrUpdateItemBtn.textContent = 'Zapisz zmiany';
     $addOrUpdateItemBtn.dataset.name = 'update';
     $addOrUpdateItemBtn.dataset.id = todo.id;
@@ -179,12 +236,14 @@ async function updateTodo(){
     let formUrl = document.getElementById('formUrl').value;
     let formAuthor = document.getElementById('formAuthor').value;
     let formDesc = document.getElementById('formDesc').value;
+    let formExtra = document.getElementById('formExtra').value;
     await axios.put(BASE_URL + $addOrUpdateItemBtn.dataset.id, {
         title:formTitle,
         priority:formPriority,
         description:formDesc,
         url:formUrl,
         author:formAuthor,
+        extra:formExtra,
 }).then(() => {
     $list.style.display = 'block';
     $addTaskForm.style.display = 'none';
@@ -201,10 +260,83 @@ async function updateTodo(){
 }
 function prepareDOMEvents(){
     $showAddFormBtn = document.getElementById('showAddForm');
+    $addOrUpdateItemBtn = document.getElementById('addOrUpdateItemForm');
     $addOrUpdateItemBtn.dataset.name = 'add';
     $showAddFormBtn.addEventListener('click',showAddFormBtnHandler);
     $addOrUpdateItemBtn.addEventListener('click',addOrUpdateItemHandler);
+    $cancelBtn.addEventListener('click',cancelBtnHandler);
+    $list.addEventListener('click',listClickHandler);
+    $todoMenu.addEventListener('click',menuClickHandler);
 
+
+}
+function cancelBtnHandler(){
+    document.getElementById('addForm').reset();
+    hideAddForm();
+
+
+}
+function menuClickHandler(event){
+    console.log(event.target.id);
+    switch(event.target.id){
+        case 'allWip':
+            $list.innerHTML ='';
+            getAllTodos();
+            showAllWip();
+        break;
+        case 'allHigh':
+            showAllofPriority(PRIORITY.high);
+        break;
+        case 'allNormal':
+            showAllofPriority(PRIORITY.normal);
+        break;
+        case 'allLow':
+            showAllofPriority(PRIORITY.low);
+        break;
+        case 'allDone':
+            showAllDone();
+        break;
+        default: return;
+    }
+
+    bootstrapValidate('#input', 'url:Please enter a valid URL!');
+
+}//wyswietlanie wszystkich todos do zrobienia
+function showAllWip(){
+    let  elements = Array.from($list.children);
+    elements.forEach(el => {
+        console.log(el.dataset.extra);
+        if(el.dataset.extra === 'active'){
+            el.style.display = 'block';
+        } else if(el.dataset.extra === 'done'){
+            el.style.display ='none';
+        }
+
+        
+    })
+}
+//wyswietlanie todos wedlug prioryteru
+function showAllofPriority(prio){
+    let  elements = Array.from($list.children);
+    elements.forEach(el => {
+        istrue=el.dataset.priority === prio && el.dataset.extra ==='active';
+            console.log(istrue);
+        if(el.dataset.priority === prio && el.dataset.extra ==='active'){
+            el.style.display = 'block';
+        } else {
+            el.style.display= 'none';
+        }
+    })
+}
+function showAllDone(){
+    let  elements = Array.from($list.children);
+    elements.forEach(el => {
+        if(el.dataset.extra != 'done'){
+            el.style.display = 'none';
+        } else {
+            el.style.display = 'block'
+        }
+    })
 
 }
 async function dataSend(){
@@ -213,12 +345,14 @@ async function dataSend(){
     let formUrl = document.getElementById('formUrl').value;
     let formAuthor = document.getElementById('formAuthor').value;
     let formDesc = document.getElementById('formDesc').value;
+    let formExtra = document.getElementById('formExtra').value;
     await axios.post(BASE_URL, {
         title:formTitle,
         priority:formPriority,
         description:formDesc,
         url:formUrl,
         author:formAuthor,
+        extra:formExtra,
 }).then(() => {
     $list.style.display = 'block';
     $addTaskForm.style.display = 'none';
@@ -232,6 +366,7 @@ async function dataSend(){
     switch(event.target.dataset.name){
         case 'add':
             dataSend();
+            coutByPriority($list);
             break;
         case 'update':
             updateTodo();
@@ -239,12 +374,14 @@ async function dataSend(){
         default:return;
         }
     }
+function hideAddForm(){
+    $list.style.display ='block';
+    $addTaskForm.style.display = 'none';
+}
 function showAddFormBtnHandler(){
         $list.style.display = 'none';
         $addTaskForm.style.display = 'block';
         
 }
-
-
 
 document.addEventListener('DOMContentLoaded', main);
