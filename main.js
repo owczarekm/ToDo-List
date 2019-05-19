@@ -75,6 +75,13 @@ function textPriority(priority){
 }
 
 //tworzenie tabeli dla jednego zadania
+function createTodoTable(todo){
+    
+    let tbl =createTableHeader(todo.title, todo.priority,todo.extra);
+    createTableBody(tbl,todo.description,todo.url,todo.author);
+    createTableFooter(tbl,todo.id);
+    return tbl;
+}
 //tworzenie tabeli i nadanie styli
 function createTableHeader(title,priority){
     let tbl = document.createElement("table");
@@ -143,13 +150,7 @@ function createTableFooter(table,id){
 }
 
 
-function createTodoTable(todo){
-    
-    let tbl =createTableHeader(todo.title, todo.priority,todo.extra);
-    createTableBody(tbl,todo.description,todo.url,todo.author);
-    createTableFooter(tbl,todo.id);
-    return tbl;
-}
+
 
 function createTodoDiv(todo){
     let newDivElement = document.createElement('div');
@@ -194,7 +195,6 @@ function listClickHandler(event){
         break;
         case 'edit':
             prepareFormEdit(event.target.dataset.id)
-            console.log('edytuj');
         break;
         default: return;
 
@@ -277,7 +277,6 @@ function cancelBtnHandler(){
 
 }
 function menuClickHandler(event){
-    console.log(event.target.id);
     switch(event.target.id){
         case 'allWip':
             $list.innerHTML ='';
@@ -299,13 +298,12 @@ function menuClickHandler(event){
         default: return;
     }
 
-    bootstrapValidate('#input', 'url:Please enter a valid URL!');
+
 
 }//wyswietlanie wszystkich todos do zrobienia
 function showAllWip(){
     let  elements = Array.from($list.children);
     elements.forEach(el => {
-        console.log(el.dataset.extra);
         if(el.dataset.extra === 'active'){
             el.style.display = 'block';
         } else if(el.dataset.extra === 'done'){
@@ -319,8 +317,6 @@ function showAllWip(){
 function showAllofPriority(prio){
     let  elements = Array.from($list.children);
     elements.forEach(el => {
-        istrue=el.dataset.priority === prio && el.dataset.extra ==='active';
-            console.log(istrue);
         if(el.dataset.priority === prio && el.dataset.extra ==='active'){
             el.style.display = 'block';
         } else {
